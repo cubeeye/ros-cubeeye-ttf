@@ -10,10 +10,10 @@
 #define MDC200_MIN_DEPTH 0
 #define MDC200_MAX_DEPTH 3750
 
-/* PUB_DEPTH and PUB_AMPLITUDE need to move on common */
-#define PUB_DEPTH "/depth/depth_raw"
-#define PUB_AMPLITUDE "/depth/amplitude_raw"
-#define PUB_PCL "/depth/points"
+
+#define PUB_DEPTH "/cubeeye/ttf/depth_raw"
+#define PUB_AMPLITUDE "/cubeeye/ttf/amplitude_raw"
+#define PUB_PCL "/cubeeye/ttf/points"
 
 class DepthTTFReader {
     private:
@@ -22,61 +22,24 @@ class DepthTTFReader {
 
         TTF_API::_ttfDeviceInfo m_stDevInfo[MAX_DEVICE]; //device information structure
         DepthFrame          *m_pDepthFrame;
-        XYZIPointCloudFrame *m_pPCLFrame;
-
-        ros::Publisher &m_PubDepthRaw;
-        ros::Publisher &m_PubAmplitudeRaw;
-        ros::Publisher &m_PubPCLRaw;
-
-        sensor_msgs::ImagePtr m_msgImgPtrDepth;
-        sensor_msgs::ImagePtr m_msgImgPtrAmplitude;
+        XYZIPointCloudFrame *m_pPCLFrame;        
 
         float* m_pDepthData;
         float* m_pAmplitudeData;
-        sensor_msgs::PointCloud2 m_msgPCL2;
-        sensor_msgs::PointCloud2Ptr m_msgPCL2ptr;
         
-        int bufferInit();        
-        int setIntegrationDutyTime();
-        
-        int getLensParameter();
-        int getIntegrationDutyTime();
-
-        int getAmplitudeThreshold();
-        int getScatteringCheckThreshold();
-        int getPhaseOffset();
-        
+        int bufferInit();                        
         int readDepthFrame(const DepthFrame* pDepthFrame);
         int readPointCloudFrame(const XYZIPointCloudFrame* pXYZIPointCloudFrame);
 
-    public:
-        bool    debug;
-        bool    setMDCParam;
-        bool    setMDCLensParam;
-        int     width;
-        int     height;
+    public:        
+        bool setMDCParam;
 
-
-        int     nAmplitudeThres;        // 0 ~ 255
-        int     nPhaseOffset;           // -127 ~ 127
-        int     nScatterThres;          // 0 ~ 255
-
-        bool    nMedianFilter;
-        bool    nSmoothFilter;
-        bool    nIIRFilter;
-        bool    nFlyPixFilter;
-
-        int     nKernelSize;
-        float   nDeadband;
-        float   nDeadbandStep;
-        float   nSigma;
-        float   nGain;
-        float   nThr;
+        int m_nAmplitudeThres;
+        int m_nScatterThres;
 
         bool mLoopOk;
 
         DepthTTFReader(ros::Publisher &pub_depth_raw, ros::Publisher &pub_amplitude_raw, ros::Publisher &pub_pcl_raw);
-
         bool connect();
         bool close();
         
@@ -86,12 +49,17 @@ class DepthTTFReader {
         void deviceClose();
         void deviceStop();
 
-        int setAmplitudeThreshold();
-        int setScatteringCheckThreshold();
-        int setPhaseOffset();
+        int SetAmplitudeThreshold();
+        int SetScatteringCheckThreshold();
 
-        int setMedianFilter();
-        int setSmoothFilter();
-        int setIIRFilter();
-        int setFlyPixFilter();
+        ros::Publisher &m_PubDepthRaw;
+        ros::Publisher &m_PubAmplitudeRaw;
+        ros::Publisher &m_PubPCLRaw;
+
+        sensor_msgs::ImagePtr m_msgImgPtrDepth;
+        sensor_msgs::ImagePtr m_msgImgPtrAmplitude;
+        sensor_msgs::PointCloud2 m_msgPCL2;
+        sensor_msgs::PointCloud2Ptr m_msgPCL2ptr;
+
+
 };

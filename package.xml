@@ -1,14 +1,19 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>depth_ttf</name>
-  <version>0.0.1</version>
-  <description>The depth_ttf package</description>
+  <name>cubeeye_ttf</name>
+  <version>1.0.0</version>
+  <description>These are packages for using TTF device with ROS.(Support model : MDC200DW)</description>
 
-  <maintainer email="ohsh@meerecompany.com">SeoHwan Oh</maintainer>
+  <maintainer email="support@cube-eye.com">CubeEye</maintainer>
+  <maintainer email="ohsh@meerecompany.com">ohsh</maintainer>
 
-  <license>LGPLv3</license>
+  <license>meerecompany</license>
 
-  <author email="ohsh@meerecompany.com">SeoHwan Oh</author>
+  <url type="website">http://wiki.ros.org/CubeEye</url>
+  <url type="bugtracker">https://github.com/cubeeye/ros-ttf</url>
+
+  <author email="support@cube-eye.com">CubeEye</author>
+  <author email="ohsh@meerecompany.com">ohsh</author>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>
@@ -24,10 +29,6 @@
   <exec_depend>sensor_msgs</exec_depend>
   <exec_depend>std_msgs</exec_depend>
 
-
-  <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <!-- Other tools can request additional information be placed here -->
-
   </export>
 </package>

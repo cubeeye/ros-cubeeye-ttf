@@ -1,47 +1,11 @@
 <launch>
-    <arg name="pkg_name" default="depth_ttf" />
-    <arg name="debug" default="false" />
-    <arg name="setMDCParam" default="false" />
-    <arg name="setLens" default="false" />
+    <arg name="pkg_name" default="cubeeye_ttf" />
+    <arg name="amplitudeThres" default="15"/>
+    <arg name="scatterThres" default="15" />
 
-
-    <arg name="amplitudeThres" default="15"/><!-- Amplitude Threshold 0~255 default is 0 -->
-    <arg name="scatterThres" default="15" /><!-- Scatterng Check Threshold 0~255 default is 0 -->
-    <arg name="phaseOffset" default="0" /><!-- Phase Offset -127~127 default is 0 -->
-
-    <arg name="smoothFilter" default="true" />
-    <arg name="FlyPixFilter" default="true" />
-    <arg name="medianFilter" default="false" />    
-    <arg name="IIRFilter" default="false" />    
-
-    <!-- Filter parameter but fixed value on include file TTF_API.h -->
-    <arg name="kernelSize" default="1" />
-    <arg name="deadband" default="0.05" />
-    <arg name="deadbandStep" default="0.01" />
-    <arg name="sigma" default="0.3" />
-    <arg name="gain" default="0.2" />
-    <arg name="thr" default="1500.0" />
-
-        <node name="depth_camera" pkg="$(arg pkg_name)" type="depth_ttf_node" output="screen" >
+    <node name="cubeeye_camera" pkg="$(arg pkg_name)" type="cubeeye_ttf_node" output="screen" >
         <param name="pkg_name"  value="$(arg pkg_name)" />
-        <param name="debug"  value="$(arg debug)" />
-        <param name="setMDCParam" value="$(arg setMDCParam)" />
-        <param name="setLens" value="$(arg setLens)" />
-
         <param name="amplitudeThres"  value="$(arg amplitudeThres)" />
-        <param name="scatterThres"  value="$(arg scatterThres)" />
-        <param name="phaseOffset"  value="$(arg phaseOffset)" />
-
-        <param name="smoothFilter"  value="$(arg smoothFilter)" />
-        <param name="FlyPixFilter"  value="$(arg FlyPixFilter)" />
-        <param name="medianFilter"  value="$(arg medianFilter)" />
-        <param name="IIRFilter"  value="$(arg IIRFilter)" />
-
-        <param name="kernelSize"  value="$(arg kernelSize)" />
-        <param name="deadband"  value="$(arg deadband)" />
-        <param name="deadbandStep"  value="$(arg deadbandStep)" />
-        <param name="sigma"  value="$(arg sigma)" />
-        <param name="gain"  value="$(arg gain)" />
-        <param name="thr"  value="$(arg thr)" />
-	</node>
+        <param name="scatterThres"  value="$(arg scatterThres)" />        
+    </node>
 </launch>

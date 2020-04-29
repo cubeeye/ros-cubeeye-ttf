@@ -9,9 +9,10 @@ DepthTTFReader::DepthTTFReader(ros::Publisher &pub_depth_raw, ros::Publisher &pu
     , m_PubAmplitudeRaw(pub_amplitude_raw)
     , m_PubPCLRaw(pub_pcl_raw)
 {
+
     /* allocates memory and initializes device handle */
-    width = MDC200_WIDTH;
-    height = MDC200_HEIGHT;
+//    m_nWidth = MDC200_WIDTH;
+//    height = MDC200_HEIGHT;
     m_nDeviceCount = 0;
     mLoopOk = true;
 
@@ -24,36 +25,36 @@ DepthTTFReader::DepthTTFReader(ros::Publisher &pub_depth_raw, ros::Publisher &pu
     //generate Depth
     m_msgImgPtrDepth = sensor_msgs::ImagePtr(new sensor_msgs::Image);
     m_msgImgPtrDepth->header.frame_id = "distance";
-    m_msgImgPtrDepth->width = width;
-    m_msgImgPtrDepth->height = height;
+    m_msgImgPtrDepth->width = MDC200_WIDTH;
+    m_msgImgPtrDepth->height = MDC200_HEIGHT;
     m_msgImgPtrDepth->is_bigendian = false;
     m_msgImgPtrDepth->encoding = sensor_msgs::image_encodings::TYPE_32FC1;
-    m_msgImgPtrDepth->step = (uint32_t)(sizeof(float) * width);
-    m_msgImgPtrDepth->data.resize(sizeof(float) * width * height);
+    m_msgImgPtrDepth->step = (uint32_t)(sizeof(float) * MDC200_WIDTH);
+    m_msgImgPtrDepth->data.resize(sizeof(float) * MDC200_WIDTH * MDC200_HEIGHT);
     m_pDepthData = (float *)&m_msgImgPtrDepth->data[0];
 
     //generate Amplitude
     m_msgImgPtrAmplitude = sensor_msgs::ImagePtr(new sensor_msgs::Image);
     m_msgImgPtrAmplitude->header.frame_id = "amplitude";
-    m_msgImgPtrAmplitude->width = width;
-    m_msgImgPtrAmplitude->height = height;
+    m_msgImgPtrAmplitude->width = MDC200_WIDTH;
+    m_msgImgPtrAmplitude->height = MDC200_HEIGHT;
     m_msgImgPtrAmplitude->is_bigendian = false;
     m_msgImgPtrAmplitude->encoding = sensor_msgs::image_encodings::TYPE_32FC1;
-    m_msgImgPtrAmplitude->step = (uint32_t)(sizeof(float) * width);
-    m_msgImgPtrAmplitude->data.resize(sizeof(float) * width * height);
+    m_msgImgPtrAmplitude->step = (uint32_t)(sizeof(float) * MDC200_WIDTH);
+    m_msgImgPtrAmplitude->data.resize(sizeof(float) * MDC200_WIDTH * MDC200_HEIGHT);
     m_pAmplitudeData = (float *)&m_msgImgPtrAmplitude->data[0];
 
     //generate Pointcloud
     m_msgPCL2ptr = sensor_msgs::PointCloud2Ptr(new sensor_msgs::PointCloud2);
     m_msgPCL2ptr->header.frame_id = "pcl";
     m_msgPCL2ptr->header.stamp = m_msgImgPtrAmplitude->header.stamp;
-    m_msgPCL2ptr->width = width;
-    m_msgPCL2ptr->height = height;
+    m_msgPCL2ptr->width = MDC200_WIDTH;
+    m_msgPCL2ptr->height = MDC200_HEIGHT;
     m_msgPCL2ptr->is_bigendian = false;
     m_msgPCL2ptr->is_dense = false;
 
     m_msgPCL2ptr->point_step = (uint32_t)(3 * sizeof(float));
-    m_msgPCL2ptr->row_step = (uint32_t)(m_msgPCL2ptr->point_step * width);
+    m_msgPCL2ptr->row_step = (uint32_t)(m_msgPCL2ptr->point_step * MDC200_WIDTH);
     m_msgPCL2ptr->fields.resize(3);
     m_msgPCL2ptr->fields[0].name = "z";
     m_msgPCL2ptr->fields[0].offset = 0;
@@ -88,138 +89,23 @@ int DepthTTFReader::bufferInit()
 }
 
 //0~255
-int DepthTTFReader::setAmplitudeThreshold() {
+int DepthTTFReader::SetAmplitudeThreshold() {
     
-    ROS_INFO("Set Amplitude Threshold %u ", nAmplitudeThres);
-    TTF_API::ttfSetAmplitudeCheckTh(m_nDevHnd, nAmplitudeThres);
+    ROS_INFO("Set Amplitude Threshold %u ", m_nAmplitudeThres);
+    TTF_API::ttfSetAmplitudeCheckTh(m_nDevHnd, m_nAmplitudeThres);
 
     return TTF_API::ERROR_NO;
 }
 
 //0~255
-int DepthTTFReader::setScatteringCheckThreshold() {
+int DepthTTFReader::SetScatteringCheckThreshold() {
 
-    ROS_INFO("Set Scattering Check Threshold : %u ", nScatterThres);
-    TTF_API::ttfSetScatteringCheckTh(m_nDevHnd, nScatterThres);
-
-    return TTF_API::ERROR_NO;
-}
-
-//-127 ~ 127
-int DepthTTFReader::setPhaseOffset() {
-
-    ROS_INFO("Set Phase Offset : %u ", nPhaseOffset);
-    TTF_API::ttfSetPhaseOffset(m_nDevHnd, nPhaseOffset);
+    ROS_INFO("Set Scattering Check Threshold : %u ", m_nScatterThres);
+    TTF_API::ttfSetScatteringCheckTh(m_nDevHnd, m_nScatterThres);
 
     return TTF_API::ERROR_NO;
 }
 
-int DepthTTFReader::setMedianFilter() {
-
-    TTF_API::ttfSetMedianFilter(m_nDevHnd, nMedianFilter, nKernelSize, nDeadband, nDeadbandStep);
-
-    ROS_INFO("Set Median Filter : %s", nMedianFilter ? "true" : "false");
-    ROS_INFO(" Kernel Size : %d", nKernelSize);
-    ROS_INFO(" Deadband : %f", nDeadband);
-    ROS_INFO(" Deadband Step : %f", nDeadbandStep);
-
-    return TTF_API::ERROR_NO;
-}
-
-int DepthTTFReader::setSmoothFilter() {
-
-    TTF_API::ttfSetSmoothFilter(m_nDevHnd, nSmoothFilter, nSigma);
-
-    ROS_INFO("Set Smooth Filter : %s", nSmoothFilter ? "true" : "false");
-    ROS_INFO(" Sigma : %f", nSigma);
-
-    return TTF_API::ERROR_NO;
-}
-
-int DepthTTFReader::setIIRFilter() {
-
-    TTF_API::ttfSetIIRFilter(m_nDevHnd, nIIRFilter, nGain);
-
-    ROS_INFO("Set IIR Filter : %s", nIIRFilter ? "true" : "false");
-    ROS_INFO(" Gain : %f", nGain);
-
-    return TTF_API::ERROR_NO;
-}
-
-int DepthTTFReader::setFlyPixFilter() {
-
-    TTF_API::ttfSetFlyPixFilter(m_nDevHnd, nFlyPixFilter, nThr);
-
-    ROS_INFO("Set FlyPix Filter : %s", nFlyPixFilter ? "true" : "false");
-    ROS_INFO(" Thr : %f", nThr);
-
-    return TTF_API::ERROR_NO;
-}
-
-
-//0~31%
-int DepthTTFReader::getIntegrationDutyTime() {
-
-    unsigned int temp;
-
-    TTF_API::ttfGetIntgDutyTime(m_nDevHnd, temp);
-    ROS_INFO("Get Integration Duty Time %u ", temp);
-
-    return TTF_API::ERROR_NO;
-}
-
-//0~255
-int DepthTTFReader::getAmplitudeThreshold() {
-    uint8_t temp;
-    
-    TTF_API::ttfGetAmplitudeCheckTh(m_nDevHnd, temp);
-    ROS_INFO("Get Amplitude Threshold %u ", temp);
-
-
-    return TTF_API::ERROR_NO;
-}
-
-//-127 ~ 127
-int DepthTTFReader::getPhaseOffset() {
-    int8_t temp;
-
-    TTF_API::ttfGetPhaseOffset(m_nDevHnd, temp);
-    ROS_INFO("Get Phase Offset : %u ", temp);
-
-    return TTF_API::ERROR_NO;
-}
-
-
-//0~255
-int DepthTTFReader::getScatteringCheckThreshold() {
-    uint8_t temp;
-
-    TTF_API::ttfGetScatteringCheckTh(m_nDevHnd, temp);
-    ROS_INFO("Get Scattering Check Threshold : %u ", temp);
-
-    return TTF_API::ERROR_NO;
-}
-
-
-int DepthTTFReader::getLensParameter() {
-    TTF_API::ttfIntrinsicParam tempIntrinsicParam;
-    TTF_API::ttfDistortionParam tempDistortionParam;
-
-    TTF_API::ttfGetLensParameter(m_nDevHnd, &tempIntrinsicParam, &tempDistortionParam);
-
-    ROS_INFO("Get IntrinsicParameter fFx : %f", tempIntrinsicParam.fFx);
-    ROS_INFO("Get IntrinsicParameter fFy : %f", tempIntrinsicParam.fFy);
-    ROS_INFO("Get IntrinsicParameter fCx : %f", tempIntrinsicParam.fCx);
-    ROS_INFO("Get IntrinsicParameter fCx : %f", tempIntrinsicParam.fCy);
-
-    ROS_INFO("Get DistortionParamter fK1 : %f", tempDistortionParam.fK1);
-    ROS_INFO("Get DistortionParamter fK2 : %f", tempDistortionParam.fK2);
-    ROS_INFO("Get DistortionParamter fK3 : %f", tempDistortionParam.fK3);
-    ROS_INFO("Get DistortionParamter fP1 : %f", tempDistortionParam.fP1);
-    ROS_INFO("Get DistortionParamter fP2 : %f", tempDistortionParam.fP2);
-
-    return TTF_API::ERROR_NO;
-}
 
 bool DepthTTFReader::connect() {
     
@@ -238,34 +124,11 @@ bool DepthTTFReader::connect() {
         ROS_INFO("VendorID : %x, ProductID : %x", m_stDevInfo[0].nVendorId, m_stDevInfo[0].nProductId);
         ROS_INFO("DeviceType : %d", m_stDevInfo[0].nDeviceType);
         ROS_INFO("SerialNum : %s", m_stDevInfo[0].szSerialNum);
-        ROS_INFO("Camera Open Success");
-
-        TTF_API::ttfSetSmoothFilter(m_stDevInfo[0].hnd, true);
-        TTF_API::ttfSetFlyPixFilter(m_stDevInfo[0].hnd, true);
+        ROS_INFO("Camera Open Success");        
     }
 
     bufferInit();
    // usleep(100); //
-
-    if(setMDCParam) {
-
-        if(debug) ROS_INFO("ERROR NO is %d", TTF_API::ERROR_NO);
-
-        setAmplitudeThreshold();
-        setScatteringCheckThreshold();
-        setPhaseOffset();
-        setMedianFilter();
-        setSmoothFilter();
-        setIIRFilter();
-        setFlyPixFilter();
-    }
-
-    if(debug) {
-        getAmplitudeThreshold();
-        getScatteringCheckThreshold();
-        getPhaseOffset();
-        getLensParameter();
-    }
 
 //    dataDepth();
     dataPCL();
