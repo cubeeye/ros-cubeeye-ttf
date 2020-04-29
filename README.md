@@ -38,25 +38,25 @@ $sudo ttfinstall.sh
 Connect the camera power and execute the following command
 
 ```bash
-$roslaunch depth_ttf depth_camera.launch
+$roslaunch cubeeye_ttf depth_camera.launch
 ```
 
 #### Topics
-- /depth/ttf/amplitude_raw : IR Image
-- /depth/ttf/depth_raw : Depth Image
-- /detph/ttf/points : Point Cloud Image
+- /cubeeye/ttf/amplitude_raw : IR Image
+- /cubeeye/ttf/depth_raw : Depth Image
+- /cubeeye/ttf/points : Point Cloud Image
 
 #### Operating Test
 ```bash
 $rqt
-/depth/ttf/amplitude_raw, /depth/ttf/depth_raw
+/cubeeye/ttf/amplitude_raw, /cubeeye/ttf/depth_raw
 ```
 <p align="center"><img width=100% src="https://user-images.githubusercontent.com/18589471/67836365-c9ef1880-fac2-11e9-84c6-d5cbc6747d90.PNG"/></p>
 
 ```bash
 $rosrun rviz rviz
 Fixed Frame : pcl
-PointCloud2 : /depth/ttf/points
+PointCloud2 : /cubeeye/ttf/points
 ```
 <p align="center"><img width=100% src="https://user-images.githubusercontent.com/18589471/67836438-028ef200-fac3-11e9-9ba4-84c60d19c32d.PNG"/></p>
 
